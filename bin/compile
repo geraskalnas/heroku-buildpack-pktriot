@@ -27,10 +27,13 @@ BP_DIR="$(cd "$(dirname "$0")"/.. && pwd)"
 topic Marking to install pktriot
 echo -n "https://pktriot-dl-bucket.sfo2.digitaloceanspaces.com/releases/linux/pktriot-0.9.15.amd64.deb " >> $1/Aptfile
 
+topic Writing pktriot startup script
+start_script=$1/bin/${PKTRIOT_WRAPPER_SCRIPT_NAME:-'start_pktriot.sh'}
+say $start_script
+mkdir -p $1/bin
+cat <<EOF > $start_script
+#!/usr/bin/env bash
 
-#cat <<EOF > $start_script
-##!/usr/bin/env bash
-#
-#
-#EOF
-#chmod +x $start_script
+pktriot tcp \${PKTRIOT_PORT:-\$PORT}
+EOF
+chmod +x $start_script
