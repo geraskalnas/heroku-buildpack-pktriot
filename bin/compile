@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# bin/compile <build-dir> <cache-dir>
+
+function say {
+  echo "       $*"
+}
+function topic {
+  echo "-----> $*"
+}
+function export_env_dir {
+  env_dir=$1
+  acceptlist_regex=${2:-''}
+  denylist_regex=${3:-'^(PATH|GIT_DIR|CPATH|CPPATH|LD_PRELOAD|LIBRARY_PATH)$'}
+  if [ -d "$env_dir" ]; then
+    for e in $(ls $env_dir); do
+      echo "$e" | grep -E "$acceptlist_regex" | grep -qvE "$denylist_regex" &&
+      export "$e=$(cat $env_dir/$e)"
+      :
+    done
+  fi
+}
+
+export_env_dir $3 '^(PKTRIOT_.*)$'
+
+BP_DIR="$(cd "$(dirname "$0")"/.. && pwd)"
+
+curl -o $1/pktriot.deb -s -L https://pktriot-dl-bucket.sfo2.digitaloceanspaces.com/releases/linux/pktriot-0.9.15.arm64.deb
+
+topic Marking to install pktriot
+echo -n '$1/pktriot.deb ' >> $1/Aptfile
+
+cat <<EOF > $start_script
+#!/usr/bin/env bash
+
+export -p >> $HOME/saved_env.sh
+
+shellinaboxd --disable-peer-check -t --port=\${SHELLINABOX_PORT:-\$PORT} -s /:\$(whoami):dyno:/app:\${SHELLINABOX_SERVICE_COMMAND:-'bash'} \$SHELLINABOX_OPTS
+EOF
+chmod +x $start_script
