@@ -25,7 +25,7 @@ export_env_dir $3 '^(PKTRIOT_.*)$'
 BP_DIR="$(cd "$(dirname "$0")"/.. && pwd)"
 
 topic Marking to install pktriot
-echo -n "https://pktriot-dl-bucket.sfo2.digitaloceanspaces.com/releases/linux/pktriot-0.9.15.arm64.deb " >> $1/Aptfile
+echo -n "https://pktriot-dl-bucket.sfo2.digitaloceanspaces.com/releases/linux/pktriot-0.9.15.amd64.deb " >> $1/Aptfile
 
 
 #cat <<EOF > $start_script
